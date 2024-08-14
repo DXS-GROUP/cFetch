@@ -8,16 +8,22 @@
 SystemInfo get_system_info() {
   SystemInfo sys_info;
 
-  // Получаем версию ядра
+  // Получаем информацию о системе
   struct utsname uname_info;
   if (uname(&uname_info) == -1) {
     strcpy(sys_info.kernel, "Unknown");
+    strcpy(sys_info.os, "Unknown");
+    strcpy(sys_info.device_name, "Unknown");
   } else {
+    // Получаем версию ядра
     strcpy(sys_info.kernel, uname_info.release);
-  }
 
-  // Получаем название системы
-  strcpy(sys_info.os, uname_info.sysname);
+    // Получаем название системы
+    strcpy(sys_info.os, uname_info.sysname);
+
+    // Получаем имя устройства
+    strcpy(sys_info.device_name, uname_info.nodename);
+  }
 
   // Получаем оболочку
   char *shell = getenv("SHELL");
