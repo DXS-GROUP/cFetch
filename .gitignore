@@ -6,3 +6,4 @@ src/get_data/get_sys.o
 src/get_data/gpu_info.o
 src/cfetch
 src/main.o
+src/get_data/uptime.o

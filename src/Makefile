@@ -13,7 +13,8 @@ SRCS = main.c \
        get_data/gpu_info.c \
        get_data/get_sys.c \
        get_data/get_ram.c \
-       get_data/disk_info.c
+       get_data/disk_info.c \
+	   get_data/uptime.c
 
 # Указываем объектные файлы
 OBJS = $(SRCS:.c=.o)

@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
 #include "get_data/disk_info.h"
@@ -7,43 +9,127 @@
 #include "get_data/get_ram.h"
 #include "get_data/get_sys.h"
 #include "get_data/gpu_info.h"
+#include "get_data/uptime.h"
 
-void print_info(const char *label, const char *value) {
-  printf(" %-14s  %-23s \n", label, value);
+#define RESET "\033[0m"
+#define BLACK "\033[40m"
+#define RED "\033[41m"
+#define GREEN "\033[42m"
+#define YELLOW "\033[43m"
+#define BLUE "\033[44m"
+#define MAGENTA "\033[45m"
+#define CYAN "\033[46m"
+#define WHITE "\033[47m"
+
+#define SQUARE "     "
+
+char *create_repeated_string(char character, int count) {
+  char *result = (char *)malloc((count + 1) * sizeof(char));
+  if (result == NULL) {
+    printf("Memory error\n");
+    return NULL;
+  }
+
+  for (int i = 0; i < count; i++) {
+    result[i] = character;
+  }
+  result[count] = '\0';
+
+  return result;
 }
 
-void print_memory_info(const char *label, int used_memory, int full_memory) {
-  printf(" %-14s  %-6.2f GB of %.2f GB \n", label, (float)used_memory / 1024,
-         (float)full_memory / 1024);
+void print_info(const char *label, const char *value, int *max_width) {
+  char buffer[100];
+  snprintf(buffer, sizeof(buffer), "  %-14s  %-23s", label, value);
+  printf("%s\n", buffer);
+
+  int current_width = strlen(buffer);
+  if (current_width > *max_width) {
+    *max_width = current_width;
+  }
 }
 
-void print_disk_info(disk_info_t *info) {
+void print_memory_info(const char *label, int used_memory, int full_memory,
+                       int *max_width) {
+  char buffer[100];
+  snprintf(buffer, sizeof(buffer), "  %-14s  %-6.2f GB of %.2f GB", label,
+           (float)used_memory / 1024, (float)full_memory / 1024);
+  printf("%s\n", buffer);
+
+  int current_width = strlen(buffer);
+  if (current_width > *max_width) {
+    *max_width = current_width;
+  }
+}
+
+void print_disk_info(disk_info_t *info, int *max_width) {
   if (get_disk_info("/", info) == 0) {
-    printf(" %-14s  %-1llu GB of %-1llu GB \n", "   Disk",
-           info->used_space / (1024 * 1024 * 1024),
-           info->total_space / (1024 * 1024 * 1024));
+    char buffer[100];
+    snprintf(buffer, sizeof(buffer), "  %-14s  %-1llu GB of %-1llu GB",
+             "   Disk", info->used_space / (1024 * 1024 * 1024),
+             info->total_space / (1024 * 1024 * 1024));
+    printf("%s\n", buffer);
+
+    int current_width = strlen(buffer);
+    if (current_width > *max_width) {
+      *max_width = current_width;
+    }
   } else {
     printf("Не удалось получить информацию о диске.\n");
   }
 }
 
+void print_uptime_info(uptime_t uptime, int *max_width) {
+  char buffer[100];
+  snprintf(buffer, sizeof(buffer), "  %-14s  %-1dd %-1dh %-1dm", "   Uptime",
+           uptime.days, uptime.hours, uptime.minutes);
+  printf("%s\n", buffer);
+
+  int current_width = strlen(buffer);
+  if (current_width > *max_width) {
+    *max_width = current_width;
+  }
+}
+
+void print_usage(const char *program_name, int *max_width) {
+  char buffer[200]; // Increased size
+  snprintf(buffer, sizeof(buffer),
+           "Usage: %s\n [--cpu] [--ram]\n [--gpu] [--disk]\n "
+           "[--host] [--kernel]\n [--os] [--shell]\n [--uptime] [--colors]\n",
+           program_name);
+  printf("%s\n", buffer);
+
+  int current_width = strlen(buffer);
+  if (current_width > *max_width) {
+    *max_width = current_width;
+  }
+}
+
 int main(int argc, char *argv[]) {
+  struct winsize w;
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+  int terminal_width = w.ws_col;
+
   CPUInfo cpu_info = get_cpu_info();
   SystemInfo sys_info = get_system_info();
   const char *gpu_model = get_gpu_model();
   disk_info_t info;
+  uptime_t uptime = get_uptime();
 
   int used_memory = get_memory_usage();
   int full_memory = get_memory_total();
 
-  int flags[9] = {
-      0}; // 0: cpu_flag, 1: ram_flag, 2: gpu_flag, 3: disk_flag, 4: user_flag,
-          // 5: kernel_flag, 6: os_flag, 7: shell_flag, 8: help_flag
+  int flags[11] = {0}; // 0: cpu_flag, 1: ram_flag, 2: gpu_flag, 3: disk_flag,
 
-  // Обработка аргументов командной строки
+  int max_width = 0;
+
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "--help") == 0) {
       flags[8] = 1; // help_flag
+    } else if (strcmp(argv[i], "--uptime") == 0) {
+      flags[9] = 1; // uptime_flag
+    } else if (strcmp(argv[i], "--colors") == 0) {
+      flags[10] = 1; // colors_flag
     } else if (strcmp(argv[i], "--cpu") == 0) {
       flags[0] = 1; // cpu_flag
     } else if (strcmp(argv[i], "--ram") == 0) {
@@ -63,36 +149,49 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // Если не указаны флаги, выводим все данные
   if (!flags[0] && !flags[1] && !flags[2] && !flags[3] && !flags[4] &&
-      !flags[5] && !flags[6] && !flags[7] && !flags[8]) {
-    print_info("   Kernel", sys_info.kernel);
-    print_info("   Hostname", sys_info.device_name);
-    print_info("   Shell", sys_info.shell);
+      !flags[5] && !flags[6] && !flags[7] && !flags[8] && !flags[9] &&
+      !flags[10]) {
+
+    print_info("   Kernel", sys_info.kernel, &max_width);
+    print_info("   Hostname", sys_info.device_name, &max_width);
+    print_info("   Shell", sys_info.shell, &max_width);
+    print_uptime_info(uptime, &max_width);
+
+    printf("\n%s%s%s%s%s%s%s%s\n", BLACK SQUARE RESET, RED SQUARE RESET,
+           GREEN SQUARE RESET, YELLOW SQUARE RESET, BLUE SQUARE RESET,
+           MAGENTA SQUARE RESET, CYAN SQUARE RESET, WHITE SQUARE RESET);
+    printf("\n");
   } else {
-    // Выводим текст указанных параметров
     if (flags[0])
-      print_info("   CPU", cpu_info.model);
+      print_info("   CPU", cpu_info.model, &max_width);
     if (flags[1])
-      print_memory_info("   RAM", used_memory, full_memory);
+      print_memory_info("   RAM", used_memory, full_memory, &max_width);
     if (flags[2])
-      print_info("   GPU", gpu_model);
+      print_info("   GPU", gpu_model, &max_width);
     if (flags[3])
-      print_disk_info(&info);
+      print_disk_info(&info, &max_width);
     if (flags[4])
-      print_info("   Hostname", sys_info.device_name);
+      print_info("   Hostname", sys_info.device_name, &max_width);
     if (flags[5])
-      print_info("   Kernel", sys_info.kernel);
+      print_info("   Kernel", sys_info.kernel, &max_width);
     if (flags[6])
-      print_info("   OS", sys_info.os);
+      print_info("   OS", sys_info.os, &max_width);
     if (flags[7])
-      print_info("   Shell", sys_info.shell);
-    if (flags[8]) {
-      printf("Usage: %s [--cpu] [--ram] [--gpu] [--disk] [--host] "
-             "[--kernel] [--os] [--shell]\n",
-             argv[0]);
-    }
+      print_info("   Shell", sys_info.shell, &max_width);
+    if (flags[9])
+      print_uptime_info(uptime, &max_width);
+    if (flags[8])
+      print_usage(argv[0], &max_width);
+    if (flags[10])
+      printf("\n%s%s%s%s%s%s%s%s\n", BLACK SQUARE RESET, RED SQUARE RESET,
+             GREEN SQUARE RESET, YELLOW SQUARE RESET, BLUE SQUARE RESET,
+             MAGENTA SQUARE RESET, CYAN SQUARE RESET, WHITE SQUARE RESET);
+    printf("\n");
   }
+
+  char *squares = create_repeated_string(' ', max_width / 8);
+  free(squares);
 
   return 0;
 }

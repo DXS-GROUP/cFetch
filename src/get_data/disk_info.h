@@ -1,4 +1,3 @@
-// disk_info.h
 #ifndef DISK_INFO_H
 #define DISK_INFO_H
 

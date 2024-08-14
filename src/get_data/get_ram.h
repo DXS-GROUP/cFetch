@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-// Функция для получения использования оперативной памяти
 long get_memory_usage();
 long get_memory_total();
 

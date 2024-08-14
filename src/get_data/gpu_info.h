@@ -1,4 +1,3 @@
-// gpu_info.h
 #ifndef GPU_INFO_H
 #define GPU_INFO_H
 

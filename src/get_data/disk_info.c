@@ -1,4 +1,3 @@
-// disk_info.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/statvfs.h>

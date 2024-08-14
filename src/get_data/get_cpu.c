@@ -5,7 +5,6 @@
 CPUInfo get_cpu_info() {
   CPUInfo cpu_info;
 
-  // Получаем модель процессора без "model name"
   FILE *fp =
       popen("awk -F ': ' '/model name/ {print $2; exit}' /proc/cpuinfo", "r");
   if (fp == NULL) {
@@ -17,10 +16,8 @@ CPUInfo get_cpu_info() {
   fgets(cpu_info.model, sizeof(cpu_info.model), fp);
   pclose(fp);
 
-  // Убираем лишние символы (например, новую строку)
   cpu_info.model[strcspn(cpu_info.model, "\n")] = 0;
 
-  // Получаем загрузку процессора
   FILE *load_fp = popen("top -bn1 | grep 'Cpu(s)' | sed 's/.*, "
                         "*\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100 - $1}'",
                         "r");
