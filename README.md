@@ -1,6 +1,6 @@
 # cFetch
 
-### A simple fetch app of C
+### A simple fetch app on C
 
 ```bash
 git clone https://github.com/DXS-GROUP/cFetch
