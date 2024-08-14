@@ -1,0 +1,8 @@
+
+src/get_data/disk_info.o
+src/get_data/get_cpu.o
+src/get_data/get_ram.o
+src/get_data/get_sys.o
+src/get_data/gpu_info.o
+src/cfetch
+src/main.o
