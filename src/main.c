@@ -91,12 +91,21 @@ void print_uptime_info(uptime_t uptime, int *max_width) {
   }
 }
 
+void print_window_manager(int *max_width) {
+  char buffer[100];
+  const char *wm = getenv("DESKTOP_SESSION");
+
+  snprintf(buffer, sizeof(buffer), "  %-14s  %-5s", "   WM", wm);
+  printf("%s\n", buffer);
+}
+
 void print_usage(const char *program_name, int *max_width) {
   char buffer[200]; // Increased size
-  snprintf(buffer, sizeof(buffer),
-           "Usage: %s\n [--cpu] [--ram]\n [--gpu] [--disk]\n "
-           "[--host] [--kernel]\n [--os] [--shell]\n [--uptime] [--colors]\n",
-           program_name);
+  snprintf(
+      buffer, sizeof(buffer),
+      "Usage: %s\n [--cpu] [--ram]\n [--gpu] [--disk]\n "
+      "[--host] [--kernel]\n [--os] [--shell]\n [--uptime] [--colors]\n [--wm]",
+      program_name);
   printf("%s\n", buffer);
 
   int current_width = strlen(buffer);
@@ -119,18 +128,12 @@ int main(int argc, char *argv[]) {
   int used_memory = get_memory_usage();
   int full_memory = get_memory_total();
 
-  int flags[11] = {0}; // 0: cpu_flag, 1: ram_flag, 2: gpu_flag, 3: disk_flag,
+  int flags[12] = {0};
 
   int max_width = 0;
 
   for (int i = 1; i < argc; i++) {
-    if (strcmp(argv[i], "--help") == 0) {
-      flags[8] = 1; // help_flag
-    } else if (strcmp(argv[i], "--uptime") == 0) {
-      flags[9] = 1; // uptime_flag
-    } else if (strcmp(argv[i], "--colors") == 0) {
-      flags[10] = 1; // colors_flag
-    } else if (strcmp(argv[i], "--cpu") == 0) {
+    if (strcmp(argv[i], "--cpu") == 0) {
       flags[0] = 1; // cpu_flag
     } else if (strcmp(argv[i], "--ram") == 0) {
       flags[1] = 1; // ram_flag
@@ -146,15 +149,24 @@ int main(int argc, char *argv[]) {
       flags[6] = 1; // os_flag
     } else if (strcmp(argv[i], "--shell") == 0) {
       flags[7] = 1; // shell_flag
+    } else if (strcmp(argv[i], "--help") == 0) {
+      flags[8] = 1; // help_flag
+    } else if (strcmp(argv[i], "--uptime") == 0) {
+      flags[9] = 1; // uptime_flag
+    } else if (strcmp(argv[i], "--colors") == 0) {
+      flags[10] = 1; // colors_flag
+    } else if (strcmp(argv[i], "--wm") == 0) {
+      flags[11] = 1; // wm_flag
     }
   }
 
   if (!flags[0] && !flags[1] && !flags[2] && !flags[3] && !flags[4] &&
       !flags[5] && !flags[6] && !flags[7] && !flags[8] && !flags[9] &&
-      !flags[10]) {
+      !flags[10] && !flags[11]) {
 
     print_info("   Kernel", sys_info.kernel, &max_width);
     print_info("   Hostname", sys_info.device_name, &max_width);
+    print_window_manager(&max_width);
     print_info("   Shell", sys_info.shell, &max_width);
     print_uptime_info(uptime, &max_width);
 
@@ -183,6 +195,9 @@ int main(int argc, char *argv[]) {
       print_uptime_info(uptime, &max_width);
     if (flags[8])
       print_usage(argv[0], &max_width);
+    if (flags[11])
+      print_window_manager(&max_width);
+
     if (flags[10])
       printf("\n%s%s%s%s%s%s%s%s\n", BLACK SQUARE RESET, RED SQUARE RESET,
              GREEN SQUARE RESET, YELLOW SQUARE RESET, BLUE SQUARE RESET,
