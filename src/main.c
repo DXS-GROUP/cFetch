@@ -51,7 +51,8 @@ void print_centered(const char *text)
   int terminal_width = w.ws_col;
 
   int text_length = strlen(text);
-  int padding = (terminal_width - text_length) / 2;
+  // int padding = (terminal_width - text_length) / 2;
+  int padding = 0;
 
   for (int i = 0; i < padding; i++)
   {
@@ -69,7 +70,8 @@ void print_centered_squares()
   const char *squares = BLACK_BG "     " RESET_BG RED_BG "     " RESET_BG GREEN_BG "     " RESET_BG YELLOW_BG "     " RESET_BG BLUE_BG "     " RESET_BG MAGENTA_BG "     " RESET_BG CYAN_BG "     " RESET_BG WHITE_BG "     " RESET_BG;
 
   int squares_length = 5 * 8;
-  int padding = (terminal_width - squares_length) / 2;
+  // int padding = (terminal_width - squares_length) / 2;
+  int padding = 0;
 
   for (int i = 0; i < padding; i++)
   {
@@ -295,7 +297,8 @@ int main(int argc, char *argv[])
     print_info("Shell", sys_info.shell, &max_width);
     print_uptime_info(uptime, &max_width);
 
-    // print_centered_squares(); // Center the colored squares
+    printf("\n");
+    print_centered_squares(); // Center the colored squares
   }
   else
   {
@@ -325,6 +328,7 @@ int main(int argc, char *argv[])
 
     if (flags[10])
     {
+      printf("\n");
       print_centered_squares(); // Center the colored squares
     }
   }
