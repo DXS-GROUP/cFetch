@@ -89,70 +89,81 @@ void print_info(const char *label, const char *value, int *max_width)
 
   spacer = "=>";
 
-  if (strstr(label, "CPU"))
+  if (strstr(label, "Usage"))
   {
-    color = CYAN;
-    icon = "  ";
-  }
-  else if (strstr(label, "RAM"))
-  {
-    color = GREEN;
-    icon = "  ";
-  }
-  else if (strstr(label, "Disk"))
-  {
+    label = "";
     color = MAGENTA;
-    icon = "  ";
-  }
-  else if (strstr(label, "Kernel"))
-  {
-    color = BLUE;
-    icon = "  ";
-  }
-  else if (strstr(label, "GPU"))
-  {
-    color = YELLOW;
-    icon = "  ";
-  }
-  else if (strstr(label, "Uptime"))
-  {
-    color = RED;
-    icon = "  ";
-  }
-  else if (strstr(label, "OS"))
-  {
-    color = MAGENTA;
-    icon = "  ";
-  }
-  else if (strstr(label, "Host"))
-  {
-    color = GREEN;
-    icon = "  ";
-  }
-  else if (strstr(label, "Shell"))
-  {
-    color = YELLOW;
-    icon = "  ";
-  }
-  else if (strstr(label, "WM"))
-  {
-    color = MAGENTA;
-    icon = "缾 ";
+    icon = "";
+    spacer = "";
+
+    printf("%s%s%-10s " WHITE " %s %s%+40s%s", color, icon, label, WHITE, spacer, value, RESET);
   }
   else
   {
-    color = RESET;
-  }
+    if (strstr(label, "CPU"))
+    {
+      color = CYAN;
+      icon = "  ";
+    }
+    else if (strstr(label, "RAM"))
+    {
+      color = GREEN;
+      icon = "  ";
+    }
+    else if (strstr(label, "Disk"))
+    {
+      color = MAGENTA;
+      icon = "  ";
+    }
+    else if (strstr(label, "Kernel"))
+    {
+      color = BLUE;
+      icon = "  ";
+    }
+    else if (strstr(label, "GPU"))
+    {
+      color = YELLOW;
+      icon = "  ";
+    }
+    else if (strstr(label, "Uptime"))
+    {
+      color = RED;
+      icon = "  ";
+    }
+    else if (strstr(label, "OS"))
+    {
+      color = MAGENTA;
+      icon = "  ";
+    }
+    else if (strstr(label, "Host"))
+    {
+      color = GREEN;
+      icon = "  ";
+    }
+    else if (strstr(label, "Shell"))
+    {
+      color = YELLOW;
+      icon = "  ";
+    }
+    else if (strstr(label, "WM"))
+    {
+      color = MAGENTA;
+      icon = "缾 ";
+    }
+    else
+    {
+      color = RESET;
+    }
+    snprintf(buffer, sizeof(buffer), "%s%s%-10s " WHITE " %s %s%+40s%s", color, icon,
+             label, WHITE, spacer, value, RESET);
+    print_centered(buffer);
 
-  snprintf(buffer, sizeof(buffer), "%s%s%-10s " WHITE " %s %s%+40s%s", color, icon,
-           label, WHITE, spacer, value, RESET);
-  print_centered(buffer);
+    int current_width = strlen(buffer);
 
-  int current_width = strlen(buffer);
-
-  if (current_width > *max_width)
-  {
-    *max_width = current_width;
+    if (current_width > *max_width)
+    {
+      *max_width = current_width;
+    }
   }
 }
 
@@ -199,13 +210,13 @@ void print_window_manager(int *max_width)
 
 void print_usage(const char *program_name, int *max_width)
 {
-  char buffer[200]; // Increased size
+  char buffer[200];
   snprintf(
       buffer, sizeof(buffer),
       GREEN
-      "Usage: %s" WHITE "\n [--cpu] [--ram]\n [--gpu] [--disk]\n "
-      "[--host] [--kernel]\n [--os] [--shell]\n [--uptime] [--colors]\n [--wm]",
+      "Usage: %s " WHITE "  [--cpu] [--ram] [--gpu] [--disk] [--host] [--kernel] [--os] [--shell] [--uptime] [--colors] [--wm]",
       program_name);
+
   print_info("Usage", buffer, max_width);
 }
 
