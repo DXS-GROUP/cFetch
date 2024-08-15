@@ -82,50 +82,68 @@ void print_info(const char *label, const char *value, int *max_width)
 {
   char buffer[100];
   const char *color;
+  const char *icon;
+  const char *spacer;
+
+  spacer = "=>";
 
   if (strstr(label, "CPU"))
   {
     color = CYAN;
+    icon = "  ";
   }
   else if (strstr(label, "RAM"))
   {
     color = GREEN;
+    icon = "  ";
   }
   else if (strstr(label, "Disk"))
   {
     color = MAGENTA;
+    icon = "  ";
   }
   else if (strstr(label, "Kernel"))
   {
     color = BLUE;
+    icon = "  ";
   }
   else if (strstr(label, "GPU"))
   {
     color = YELLOW;
+    icon = "  ";
   }
-  else if (strstr(label, "Uptime") || strstr(label, "OS"))
+  else if (strstr(label, "Uptime"))
   {
     color = RED;
+    icon = "  ";
+  }
+  else if (strstr(label, "OS"))
+  {
+    color = MAGENTA;
+    icon = "  ";
   }
   else if (strstr(label, "Host"))
   {
     color = GREEN;
+    icon = "  ";
   }
   else if (strstr(label, "Shell"))
   {
     color = YELLOW;
+    icon = "  ";
   }
   else if (strstr(label, "WM"))
   {
     color = MAGENTA;
+    icon = "缾 ";
   }
   else
   {
     color = RESET;
   }
 
-  snprintf(buffer, sizeof(buffer), "%s%-10s " WHITE " => %s%+40s%s", color,
-           label, WHITE, value, RESET);
+  snprintf(buffer, sizeof(buffer), "%s%s%-10s " WHITE " %s %s%+40s%s", color, icon,
+           label, WHITE, spacer, value, RESET);
   print_centered(buffer);
 
   int current_width = strlen(buffer);
