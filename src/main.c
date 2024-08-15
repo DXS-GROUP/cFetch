@@ -69,8 +69,8 @@ void print_centered(const char *text)
   int terminal_width = w.ws_col;
 
   int text_length = strlen(text);
-  int padding = (terminal_width - text_length) / 2;
-  // int padding = 0;
+  // int padding = (terminal_width - text_length) / 2;
+  int padding = 0;
 
   for (int i = 0; i < padding; i++)
   {
@@ -90,8 +90,8 @@ void print_centered_squares()
       " " RESET MAGENTA " " RESET CYAN " " RESET WHITE " " RESET;
 
   int squares_length = 5 * 8;
-  int padding = (terminal_width - squares_length) / 2;
-  // int padding = 0;
+  // int padding = (terminal_width - squares_length) / 2;
+  int padding = 0;
 
   for (int i = 0; i < padding; i++)
   {
@@ -109,8 +109,8 @@ void print_info(const char *label, const char *value, int *max_width)
 
   icon = "";
 
-  // spacer = RED_BG " " RESET_BG;
-  spacer = "";
+  spacer = MAGENTA_BG " " RESET_BG;
+  // spacer = "";
 
   if (strstr(label, "Usage"))
   {
@@ -127,52 +127,52 @@ void print_info(const char *label, const char *value, int *max_width)
     if (strstr(label, "CPU"))
     {
       color = MAGENTA;
-      // icon = "  ";
+      icon = "  ";
     }
     else if (strstr(label, "RAM"))
     {
       color = MAGENTA;
-      // icon = " 󰍛  ";
+      icon = "󰍛  ";
     }
     else if (strstr(label, "Disk"))
     {
       color = MAGENTA;
-      // icon = "  ";
+      icon = "  ";
     }
     else if (strstr(label, "Kernel"))
     {
       color = MAGENTA;
-      // icon = "  ";
+      icon = "  ";
     }
     else if (strstr(label, "GPU"))
     {
       color = MAGENTA;
-      // icon = "  ";
+      icon = "  ";
     }
     else if (strstr(label, "Uptime"))
     {
       color = MAGENTA;
-      // icon = "  ";
+      icon = "  ";
     }
     else if (strstr(label, "OS"))
     {
       color = MAGENTA;
-      // icon = "  ";
+      icon = "  ";
     }
     else if (strstr(label, "Host"))
     {
       color = MAGENTA;
-      // icon = "󰏔  ";
+      icon = "󰏔  ";
     }
     else if (strstr(label, "Shell"))
     {
       color = MAGENTA;
-      // icon = "  ";
+      icon = "  ";
     }
     else if (strstr(label, "WM"))
     {
       color = MAGENTA;
-      // icon = "  ";
+      icon = "  ";
     }
     else
     {
