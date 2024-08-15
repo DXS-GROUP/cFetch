@@ -31,6 +31,24 @@
 #define CYAN "\033[0;36m"
 #define WHITE "\033[0;37m"
 
+void wait_for_keypress()
+{
+#ifdef _WIN32
+  _getch();
+#else
+  getchar();
+#endif
+}
+
+void clear_terminal()
+{
+#ifdef _WIN32
+  system("cls");
+#else
+  system("clear");
+#endif
+}
+
 char *create_repeated_string(char character, int count)
 {
   char *result = (char *)malloc((count + 1) * sizeof(char));
@@ -51,8 +69,8 @@ void print_centered(const char *text)
   int terminal_width = w.ws_col;
 
   int text_length = strlen(text);
-  // int padding = (terminal_width - text_length) / 2;
-  int padding = 0;
+  int padding = (terminal_width - text_length) / 2;
+  // int padding = 0;
 
   for (int i = 0; i < padding; i++)
   {
@@ -67,11 +85,13 @@ void print_centered_squares()
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
   int terminal_width = w.ws_col;
 
-  const char *squares = BLACK_BG "     " RESET_BG RED_BG "     " RESET_BG GREEN_BG "     " RESET_BG YELLOW_BG "     " RESET_BG BLUE_BG "     " RESET_BG MAGENTA_BG "     " RESET_BG CYAN_BG "     " RESET_BG WHITE_BG "     " RESET_BG;
+  const char *squares = WHITE
+      " " RESET RED " " RESET GREEN " " RESET YELLOW " " RESET BLUE
+      " " RESET MAGENTA " " RESET CYAN " " RESET WHITE " " RESET;
 
   int squares_length = 5 * 8;
-  // int padding = (terminal_width - squares_length) / 2;
-  int padding = 0;
+  int padding = (terminal_width - squares_length) / 2;
+  // int padding = 0;
 
   for (int i = 0; i < padding; i++)
   {
@@ -87,7 +107,8 @@ void print_info(const char *label, const char *value, int *max_width)
   const char *icon;
   const char *spacer;
 
-  spacer = "=>";
+  // spacer = RED_BG " " RESET_BG;
+  spacer = "";
 
   if (strstr(label, "Usage"))
   {
@@ -96,19 +117,20 @@ void print_info(const char *label, const char *value, int *max_width)
     icon = "";
     spacer = "";
 
-    printf("%s%s%-10s " WHITE " %s %s%+40s%s", color, icon, label, WHITE, spacer, value, RESET);
+    printf("%s%s%-10s " WHITE " %s%+40s%s", color, icon, label, WHITE, value,
+           RESET);
   }
   else
   {
     if (strstr(label, "CPU"))
     {
-      color = CYAN;
+      color = MAGENTA;
       icon = "  ";
     }
     else if (strstr(label, "RAM"))
     {
-      color = GREEN;
-      icon = "  ";
+      color = MAGENTA;
+      icon = " 󰍛  ";
     }
     else if (strstr(label, "Disk"))
     {
@@ -117,45 +139,45 @@ void print_info(const char *label, const char *value, int *max_width)
     }
     else if (strstr(label, "Kernel"))
     {
-      color = BLUE;
+      color = MAGENTA;
       icon = "  ";
     }
     else if (strstr(label, "GPU"))
     {
-      color = YELLOW;
+      color = MAGENTA;
       icon = "  ";
     }
     else if (strstr(label, "Uptime"))
     {
-      color = RED;
+      color = MAGENTA;
       icon = "  ";
     }
     else if (strstr(label, "OS"))
     {
       color = MAGENTA;
-      icon = "  ";
+      icon = "  ";
     }
     else if (strstr(label, "Host"))
     {
-      color = GREEN;
-      icon = "  ";
+      color = MAGENTA;
+      icon = "󰏔  ";
     }
     else if (strstr(label, "Shell"))
     {
-      color = YELLOW;
-      icon = "  ";
+      color = MAGENTA;
+      icon = "  ";
     }
     else if (strstr(label, "WM"))
     {
       color = MAGENTA;
-      icon = "缾 ";
+      icon = "  ";
     }
     else
     {
       color = RESET;
     }
-    snprintf(buffer, sizeof(buffer), "%s%s%-10s " WHITE " %s %s%+40s%s", color, icon,
-             label, WHITE, spacer, value, RESET);
+    snprintf(buffer, sizeof(buffer), "%s%s%-10s " WHITE " %s %s%+40s%s", color,
+             icon, label, WHITE, spacer, value, RESET);
     print_centered(buffer);
 
     int current_width = strlen(buffer);
@@ -211,11 +233,11 @@ void print_window_manager(int *max_width)
 void print_usage(const char *program_name, int *max_width)
 {
   char buffer[200];
-  snprintf(
-      buffer, sizeof(buffer),
-      GREEN
-      "Usage: %s " WHITE "  [--cpu] [--ram] [--gpu] [--disk] [--host] [--kernel] [--os] [--shell] [--uptime] [--colors] [--wm]",
-      program_name);
+  snprintf(buffer, sizeof(buffer),
+           GREEN "Usage: %s " WHITE
+                 "  [--cpu] [--ram] [--gpu] [--disk] [--host] [--kernel] "
+                 "[--os] [--shell] [--uptime] [--colors] [--wm]",
+           program_name);
 
   print_info("Usage", buffer, max_width);
 }
@@ -251,8 +273,27 @@ void print_os(int *max_width)
   print_info("OS", os_name, max_width);
 }
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void print_art(int *max_width)
+{
+  const char *linux_logo_1 = RED_BG "    ,___  " RESET_BG;
+  const char *linux_logo_2 = RED_BG "   _| ()\\\ " RESET_BG;
+  const char *linux_logo_3 = RED_BG " /    --' " RESET_BG;
+  const char *linux_logo_4 = RED_BG " \\\ __^/   " RESET_BG;
+
+  print_centered(linux_logo_1);
+  print_centered(linux_logo_2);
+  print_centered(linux_logo_3);
+  print_centered(linux_logo_4);
+}
+
 int main(int argc, char *argv[])
 {
+  clear_terminal();
+
   struct winsize w;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
   int terminal_width = w.ws_col;
@@ -296,6 +337,8 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[i], "--wm") == 0)
       flags[11] = 1;
   }
+
+  // print_art(&max_width);
 
   if (!flags[0] && !flags[1] && !flags[2] && !flags[3] && !flags[4] &&
       !flags[5] && !flags[6] && !flags[7] && !flags[8] && !flags[9] &&
@@ -346,6 +389,8 @@ int main(int argc, char *argv[])
 
   char *squares = create_repeated_string(' ', max_width / 8);
   free(squares);
+
+  wait_for_keypress();
 
   return 0;
 }
