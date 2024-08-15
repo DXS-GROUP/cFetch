@@ -7,3 +7,4 @@ src/get_data/gpu_info.o
 src/cfetch
 src/main.o
 src/get_data/uptime.o
+art.txt

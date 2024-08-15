@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-CPUInfo get_cpu_info() {
+CPUInfo get_cpu_info()
+{
   CPUInfo cpu_info;
 
   FILE *fp =
-      popen("awk -F ': ' '/model name/ {print $2; exit}' /proc/cpuinfo", "r");
-  if (fp == NULL) {
+      popen("awk -F ':' '/model name/ {print $2; exit}' /proc/cpuinfo", "r");
+  if (fp == NULL)
+  {
     strcpy(cpu_info.model, "Unknown");
     cpu_info.load = -1.0;
     return cpu_info;
@@ -21,7 +23,8 @@ CPUInfo get_cpu_info() {
   FILE *load_fp = popen("top -bn1 | grep 'Cpu(s)' | sed 's/.*, "
                         "*\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100 - $1}'",
                         "r");
-  if (load_fp == NULL) {
+  if (load_fp == NULL)
+  {
     cpu_info.load = -1.0;
     return cpu_info;
   }
