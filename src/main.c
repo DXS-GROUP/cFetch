@@ -107,6 +107,8 @@ void print_info(const char *label, const char *value, int *max_width)
   const char *icon;
   const char *spacer;
 
+  icon = "";
+
   // spacer = RED_BG " " RESET_BG;
   spacer = "";
 
@@ -125,52 +127,52 @@ void print_info(const char *label, const char *value, int *max_width)
     if (strstr(label, "CPU"))
     {
       color = MAGENTA;
-      icon = "  ";
+      // icon = "  ";
     }
     else if (strstr(label, "RAM"))
     {
       color = MAGENTA;
-      icon = " 󰍛  ";
+      // icon = " 󰍛  ";
     }
     else if (strstr(label, "Disk"))
     {
       color = MAGENTA;
-      icon = "  ";
+      // icon = "  ";
     }
     else if (strstr(label, "Kernel"))
     {
       color = MAGENTA;
-      icon = "  ";
+      // icon = "  ";
     }
     else if (strstr(label, "GPU"))
     {
       color = MAGENTA;
-      icon = "  ";
+      // icon = "  ";
     }
     else if (strstr(label, "Uptime"))
     {
       color = MAGENTA;
-      icon = "  ";
+      // icon = "  ";
     }
     else if (strstr(label, "OS"))
     {
       color = MAGENTA;
-      icon = "  ";
+      // icon = "  ";
     }
     else if (strstr(label, "Host"))
     {
       color = MAGENTA;
-      icon = "󰏔  ";
+      // icon = "󰏔  ";
     }
     else if (strstr(label, "Shell"))
     {
       color = MAGENTA;
-      icon = "  ";
+      // icon = "  ";
     }
     else if (strstr(label, "WM"))
     {
       color = MAGENTA;
-      icon = "  ";
+      // icon = "  ";
     }
     else
     {
