@@ -234,14 +234,13 @@ void print_window_manager(int *max_width)
 
 void print_usage(const char *program_name, int *max_width)
 {
-  char buffer[200];
-  snprintf(buffer, sizeof(buffer),
-           GREEN "Usage: %s " WHITE
-                 "  [--cpu] [--ram] [--gpu] [--disk] [--host] [--kernel] "
-                 "[--os] [--shell] [--uptime] [--colors] [--wm]",
-           program_name);
+  printf("%s ▄▄· ·▄▄▄▄▄▄ .▄▄▄▄▄ ▄▄·  ▄ .▄\n", RED);
+  printf("▐█ ▌▪▐▄▄·▀▄.▀·•██  ▐█ ▌▪██▪▐█\n");
+  printf("██ ▄▄██▪ ▐▀▀▪▄ ▐█.▪██ ▄▄██▀▐█\n");
+  printf("▐███▌██▌.▐█▄▄▌ ▐█▌·▐███▌██▌▐▀\n");
+  printf("·▀▀▀ ▀▀▀  ▀▀▀  ▀▀▀ ·▀▀▀ ▀▀▀ ·\n\n");
 
-  print_info("Usage", buffer, max_width);
+  printf(GREEN "Usage:\n\n--cpu\n--ram\n--gpu\n--disk\n--host\n--kernel\n--os\n--shell\n--uptime\n--colors\n--wm");
 }
 
 void print_os(int *max_width)
@@ -392,7 +391,7 @@ int main(int argc, char *argv[])
   char *squares = create_repeated_string(' ', max_width / 8);
   free(squares);
 
-  wait_for_keypress();
+  // wait_for_keypress();
 
   return 0;
 }
